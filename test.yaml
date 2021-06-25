@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-web-v1
+  labels:
+    app: app-web-k8s
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      project: web
+  template:
+    metadata:
+      project: web
+    spec:
+      containers:
+        - name: test-web
+          image: nginx:latest
+          ports:
+            - containerPort: 80
+
+---
+apiVersion: apps/v1
+kind: Service
+metadata:
+  name: app-web-sevice
+spec:
+  selector:
+    project: web
+  ports:
+    - name: app-web-port
+      protocol: TCP
+      port: 80
+      targetPort: 80
+  type: LoadBalancer
+
+---
+apiVersion: apps/v1
+kind: Ingress
+metadata:
+  name: app-web-ingress
+spec:
+  rules:
+    - host: TASK-123.backend-test.skblab.ru
+      http: 
+        path:
+          - backend:
+            serviceName: app-web-service
+            servicePort: 80
